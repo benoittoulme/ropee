@@ -14,7 +14,7 @@ import (
 	"github.com/golang/snappy"
 	"github.com/kebe7jun/ropee/metrics"
 	"github.com/kebe7jun/ropee/storage"
-	"github.com/lestrrat/go-file-rotatelogs"
+	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/prometheus/prompb"
 )
@@ -74,10 +74,13 @@ func initConfig() {
 	flag.Parse()
 }
 
+func health(w http.ResponseWriter, r *http.Request) {}
+
 func main() {
 	initConfig()
 	l := loadLogger()
 	http.Handle("/metrics", promhttp.Handler())
+	http.HandleFunc("/health", health)
 	http.HandleFunc("/read", func(w http.ResponseWriter, r *http.Request) {
 		compressed, err := ioutil.ReadAll(r.Body)
 		if err != nil {
